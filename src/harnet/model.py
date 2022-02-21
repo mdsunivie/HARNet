@@ -511,7 +511,7 @@ class MetricCallback(Callback):
         metric_dict_train = get_model_metrics(self.model, self.scaler, self.ts, self.idx_range_train,
                                               loss=self.model.loss, prefix="train_")
         metric_dict_val = get_model_metrics(self.model, self.scaler, self.ts, self.idx_range_val,
-                                            loss=self.model.loss, prefix="val_")
+                                            loss=self.model.loss, prefix="test_")
 
         metric_dict = {**metric_dict_train, **metric_dict_val}
 

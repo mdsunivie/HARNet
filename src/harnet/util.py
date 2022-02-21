@@ -1,6 +1,7 @@
 import importlib
 import json
 import logging
+from typing import List
 from dataclasses import field
 from datetime import datetime
 from pathlib import Path
@@ -19,7 +20,7 @@ class HARNetCfg:
     filters_dconv: int = 1
     use_bias_dconv: bool = False
     activation_dconv: str = "relu"
-    lags: list[int] = field(default_factory=lambda: [1, 5, 20])
+    lags: List[int] = field(default_factory=lambda: [1, 5, 20])
 
     # Optimization
     learning_rate: float = 0.0001

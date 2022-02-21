@@ -1,0 +1,12 @@
+{
+  "model": "HARNet",
+  "lags": [1, 5, 20],
+  "baseline_fit": "OLS",
+  "scaler": "MinMax",
+  "loss": "MSE",
+  "path_MAN": "./data/MAN_data.csv",
+  "start_year_train": 2012,
+  "n_years_train": 4,
+  "start_year_test": 2016,
+  "n_years_test": 1
+}

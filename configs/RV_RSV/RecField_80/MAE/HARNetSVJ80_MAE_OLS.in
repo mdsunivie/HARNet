@@ -1,0 +1,13 @@
+{
+  "model": "HARNetSVJ",
+  "lags": [1, 5, 20, 40, 80],
+  "baseline_fit": "OLS",
+  "scaler": "MinMax",
+  "loss": "MAE",
+  "path_MAN": "./data/MAN_data.csv",
+  "include_sv": true,
+  "start_year_train": 2012,
+  "n_years_train": 4,
+  "start_year_test": 2016,
+  "n_years_test": 1
+}

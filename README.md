@@ -22,9 +22,13 @@ to install the package.
 
 # Usage
 
-Download the MAN file and save it to HARNet/data
+Download the MAN file and save it to HARNet/data.
 
-Start single experiments from one of the preset configuration files
+Go to the HARNet root directory
+```bash
+cd HARNet
+```
+an start single experiments based on one of the preset configuration files
 
 ```bash
 harnet ./configs/RV/RecField_20/HAR20_OLS.in

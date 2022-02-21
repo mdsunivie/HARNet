@@ -23,13 +23,13 @@ class HARNetCfg:
 
     # Optimization
     learning_rate: float = 0.0001
-    epochs: int = 50 #10000
+    epochs: int = 10000
     steps_per_epoch: int = 1
     label_length: int = 5
     batch_size: int = 4
     optimizer: str = "Adam"
     loss: str = "QLIKE"
-    verbose: int = 0 #2
+    verbose: int = 1
     baseline_fit: str = "WLS"
 
     # Data

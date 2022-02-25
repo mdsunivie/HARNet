@@ -76,14 +76,14 @@ def get_MAN_data(path, asset=".SPX", include_sv=False):  # , estimator="rv5_ss"
     data = pd.read_csv(Path(path))
     data_asset = data[data.Symbol == asset]
     if include_sv:
-        ts = data_asset.set_index("date")[['rv5_ss', 'rsv_ss']]
+        ts = data_asset.set_index(data_asset.columns[0])[['rv5_ss', 'rsv_ss']]
         ts = ts.assign(rsv_pos=(ts['rv5_ss'] - ts['rsv_ss']).values)
         signed_jumps = (ts['rsv_pos'] - ts['rsv_ss']).values
         ts = ts.assign(signed_jumps=signed_jumps)
         del ts['rsv_pos']
         ts.index = pd.DatetimeIndex(pd.to_datetime(ts.index, utc=True))
     else:
-        ts = data_asset.set_index("date")[['rv5_ss']]
+        ts = data_asset.set_index(data_asset.columns[0])[['rv5_ss']]
         ts.index = pd.DatetimeIndex(pd.to_datetime(ts.index, utc=True))
 
     return ts

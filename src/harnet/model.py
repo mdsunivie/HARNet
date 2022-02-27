@@ -13,6 +13,7 @@ logger = logging.getLogger('harnet')
 
 DTYPE = tf.float32
 
+
 def scaler_from_cfg(cfg):
     if cfg.scaler == "MinMax":
         return MinMaxScaler(cfg.scaler_min, cfg.scaler_max)
@@ -26,28 +27,33 @@ def scaler_from_cfg(cfg):
         logging.warning(f"Scaler {cfg.scaler} unknown. Using NoScaler.")
         return NoneScaler()
 
+
 def get_HARSVJ_baseline_fit(lags, baseline_fit, ts_norm, idx_range_train):
     harsvj = HARSVJ(lags, baseline_fit)
     harsvj.fit(ts_norm.values[idx_range_train[0] - harsvj.max_lag:idx_range_train[1], :])
     return harsvj.coeffs
+
 
 def get_HAR_baseline_fit(lags, baseline_fit, ts_norm, idx_range_train):
     har = HAR(lags, baseline_fit)
     har.fit(ts_norm.values[idx_range_train[0] - har.max_lag:idx_range_train[1], :])
     return har.coeffs
 
+
 def model_from_cfg(cfg, ts_norm, scaler, idx_range_train):
-    clip_value = scaler.transform(0.5 * scaler.inverse_transform(np.min(ts_norm.values[idx_range_train[0]:idx_range_train[1], 0])))
+    clip_value = scaler.transform(
+        0.5 * scaler.inverse_transform(np.min(ts_norm.values[idx_range_train[0]:idx_range_train[1], 0])))
     if cfg.model == "HAR":
         model = HAR(cfg.lags, cfg.baseline_fit, clip_value)
     elif cfg.model == "HARSVJ":
-        model = HAR(cfg.lags, cfg.baseline_fit, clip_value)
+        model = HARSVJ(cfg.lags, cfg.baseline_fit, clip_value)
     elif cfg.model == "HARNet":
-        regr_coeffs = get_HAR_baseline_fit(cfg.lags,cfg.baseline_fit,ts_norm,idx_range_train)
+        regr_coeffs = get_HAR_baseline_fit(cfg.lags, cfg.baseline_fit, ts_norm, idx_range_train)
         model = HARNet(cfg.filters_dconv, cfg.use_bias_dconv, cfg.activation_dconv, cfg.lags, regr_coeffs, clip_value)
     elif cfg.model == "HARNetSVJ":
-        regr_coeffs = get_HARSVJ_baseline_fit(cfg.lags,cfg.baseline_fit,ts_norm,idx_range_train)
-        model =  HARNetSVJ(cfg.filters_dconv, cfg.use_bias_dconv, cfg.activation_dconv, cfg.lags, regr_coeffs, clip_value)
+        regr_coeffs = get_HARSVJ_baseline_fit(cfg.lags, cfg.baseline_fit, ts_norm, idx_range_train)
+        model = HARNetSVJ(cfg.filters_dconv, cfg.use_bias_dconv, cfg.activation_dconv, cfg.lags, regr_coeffs,
+                          clip_value)
     elif cfg.model == "NaiveAvg":
         model = NaiveAverage()
     else:
@@ -55,16 +61,19 @@ def model_from_cfg(cfg, ts_norm, scaler, idx_range_train):
         return None
     return model
 
+
 def nan(shape):
     ar = np.empty(shape)
     ar[:] = np.nan
     return ar
+
 
 def get_avg_ts(ts, n_avg):
     ts_ret = nan(len(ts))
     for k in range(n_avg - 1, len(ts)):
         ts_ret[k] = np.sum(ts[k - n_avg + 1:k + 1]) / n_avg
     return ts_ret
+
 
 class RVPredModel(Model):
     def __init__(self):
@@ -113,11 +122,11 @@ class RVPredModel(Model):
 
         return generator
 
+
 class NaiveAverage(object):
 
     def __init__(self, n_avg):
         self.n_avg = n_avg
-
 
     @property
     def max_lag(self):
@@ -132,8 +141,9 @@ class NaiveAverage(object):
     def save_weights(self, path):
         pass
 
+
 class HAR(object):
-    def __init__(self, lags, fit_method = 'OLS', clip_value = 0.0):
+    def __init__(self, lags, fit_method='OLS', clip_value=0.0):
         self.lags = lags
         self.fit_method = fit_method
         self.clip_value = clip_value
@@ -210,6 +220,7 @@ class HARSVJ(HAR):
         X = np.c_[np.ones(X.shape[0]), X]
         return X[self.max_lag - 1:, :]
 
+
 class HARNet(RVPredModel):
     def __init__(self, filters_dconv, use_bias_dconv, activation_dconv, lags, regr_coeff, clip_value):
         super(HARNet, self).__init__()
@@ -256,6 +267,7 @@ def get_loss(name):
     else:
         return tf.keras.losses.get(name)
 
+
 class HARNetSVJ(RVPredModel):
     def __init__(self, filters_dconv, use_bias_dconv, activation_dconv, lags, regr_coeff, clip_value):
         super(HARNetSVJ, self).__init__()
@@ -287,10 +299,12 @@ class HARNetSVJ(RVPredModel):
         regr_coeff_mapping = [0]
         for k in range(len(self.lags)):
             regr_coeff_mapping.append(k + 1)
-            regr_coeff_mapping.append(k + (len(self.lags) -1)*2)
+            regr_coeff_mapping.append(k + (len(self.lags) - 1) * 2)
         self.output_layer = Dense(1, activation='linear',
-                                  kernel_initializer=tf.keras.initializers.constant(np.array([regr_coeff[k] for k in regr_coeff_mapping])),
+                                  kernel_initializer=tf.keras.initializers.constant(
+                                      np.array([regr_coeff[k] for k in regr_coeff_mapping])),
                                   use_bias=False)
+
     @property
     def max_lag(self):
         return np.max(self.lags)
@@ -398,6 +412,7 @@ class HarNet_sv_avgs_J_80(RVPredModel):
                                 clip_value_min=self.clip_value,
                                 clip_value_max=1000)
 
+
 def get_pred(model, scaler, ts, pred_range=None):
     if pred_range is None:
         pred_range = [model.max_lag, len(ts[:, 0])]
@@ -423,12 +438,13 @@ def get_pred(model, scaler, ts, pred_range=None):
 
 def get_model_metrics(model, scaler, ts, idx_range, loss=None, prefix=""):
     ts = ts[idx_range[0] - model.max_lag:idx_range[1], :]
-    ts_pred, ts_norm_pred, ts_norm_pred_raw, target, target_norm, target_norm_raw, pred_range = get_pred(model, scaler, ts)
+    ts_pred, ts_norm_pred, ts_norm_pred_raw, target, target_norm, target_norm_raw, pred_range = get_pred(model, scaler,
+                                                                                                         ts)
     return_dict = {}
     return_dict[prefix + "_MAE"] = np.mean(np.abs(ts_pred - target))
     return_dict[prefix + "_MSE"] = np.mean(np.square(ts_pred - target))
     return_dict[prefix + "_QLIKE"] = np.mean(tf.math.divide(target, ts_pred) -
-                                                 np.log(tf.math.divide(target, ts_pred)) - 1)
+                                             np.log(tf.math.divide(target, ts_pred)) - 1)
     return_dict[prefix + "_norm_MAE"] = np.mean(np.abs(ts_norm_pred - target_norm))
     return_dict[prefix + "_norm_MSE"] = np.mean(np.square(ts_norm_pred - target_norm))
     return_dict[prefix + "_norm_QLIKE"] = np.mean(
@@ -439,6 +455,7 @@ def get_model_metrics(model, scaler, ts, idx_range, loss=None, prefix=""):
                                                            tf.convert_to_tensor(ts_norm_pred_raw,
                                                                                 dtype=DTYPE))).numpy()
     return return_dict
+
 
 class MinMaxScaler:
     def __init__(self, min, max):
@@ -468,6 +485,7 @@ class LogMinMaxScaler:
     def inverse_transform(self, ts):
         return np.exp(self.mm_scaler.inverse_transform(ts))
 
+
 class NoneScaler:
     def __init__(self):
         pass
@@ -481,6 +499,7 @@ class NoneScaler:
     def inverse_transform(self, ts):
         return ts
 
+
 class LogScaler:
     def __init__(self):
         pass
@@ -493,6 +512,7 @@ class LogScaler:
 
     def inverse_transform(self, ts):
         return np.exp(ts)
+
 
 class MetricCallback(Callback):
     def __init__(self, ts, idx_range_train, idx_range_val, scaler, tb_path, save_best_weights=None):

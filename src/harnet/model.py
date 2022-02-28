@@ -296,10 +296,12 @@ class HARNetSVJ(RVPredModel):
                        kernel_initializer=kernel_avg_init,
                        dilation_rate=self.lags[k],
                        activation=activation_dconv, use_bias=use_bias_dconv))
-        regr_coeff_mapping = [0]
-        for k in range(len(self.lags)):
-            regr_coeff_mapping.append(k + 1)
-            regr_coeff_mapping.append(k + (len(self.lags) - 1) * 2)
+        regr_coeff_mapping = np.array([0])
+        rv_avgs_idxs = np.arange(1, len(self.lags) + 1)
+        rsv_avgs_idxs = np.arange(len(self.lags) + 1, len(self.lags) * 2 + 1)
+        avgs_idxs = np.c_[rv_avgs_idxs, rsv_avgs_idxs].flatten()
+        regr_coeff_mapping = np.append(regr_coeff_mapping, avgs_idxs)
+        regr_coeff_mapping = np.append(regr_coeff_mapping, len(regr_coeff) - 1)  # to include regr coeff for jumps
         self.output_layer = Dense(1, activation='linear',
                                   kernel_initializer=tf.keras.initializers.constant(
                                       np.array([regr_coeff[k] for k in regr_coeff_mapping])),

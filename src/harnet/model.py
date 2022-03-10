@@ -299,8 +299,7 @@ class HARNetSVJ(RVPredModel):
         regr_coeff_mapping = np.array([0])
         rv_avgs_idxs = np.arange(1, len(self.lags) + 1)
         rsv_avgs_idxs = np.arange(len(self.lags) + 1, len(self.lags) * 2 + 1)
-        avgs_idxs = np.c_[rv_avgs_idxs, rsv_avgs_idxs].flatten()
-        regr_coeff_mapping = np.append(regr_coeff_mapping, avgs_idxs)
+        regr_coeff_mapping = np.append(regr_coeff_mapping, np.c_[rv_avgs_idxs, rsv_avgs_idxs].flatten())
         regr_coeff_mapping = np.append(regr_coeff_mapping, len(regr_coeff) - 1)  # to include regr coeff for jumps
         self.output_layer = Dense(1, activation='linear',
                                   kernel_initializer=tf.keras.initializers.constant(
@@ -325,95 +324,6 @@ class HARNetSVJ(RVPredModel):
         return tf.clip_by_value(self.output_layer(tf.concat([avgs, jumps], -1))[:, self.max_lag - 1:, :],
                                 clip_value_min=self.clip_value,
                                 clip_value_max=1000)
-
-
-class HarNet_sv_avgs_J_80(RVPredModel):
-    def __init__(self, cfg, regr_coeff, clip_value):
-        super(HarNet_sv_avgs_J_80, self).__init__(config)
-        self.config = config
-        self.lags = config.model.lags
-        self.clip_value = clip_value
-        if np.any(np.array(self.lags)[1:] % np.array(self.lags)[:-1]):
-            raise Exception('each lag must be a multiple of the previous one')
-        self.coeffs = regr_coeff
-        self.avg_layers = [Conv1D(filters=config.model.filters_dconv, kernel_size=self.lags[1],
-                                  kernel_initializer=self.kernel_init_avg1,
-                                  activation=config.optimization.activation, use_bias=False, padding='causal')]
-
-        self.avg_layers.append(
-            Conv1D(filters=config.model.filters_dconv, kernel_size=4,
-                   padding='causal',
-                   kernel_initializer=self.kernel_init_avg2,
-                   dilation_rate=5,
-                   activation=config.optimization.activation, use_bias=False))
-        self.avg_layers.append(
-            Conv1D(filters=config.model.filters_dconv, kernel_size=2,
-                   padding='causal',
-                   kernel_initializer=self.kernel_init_avg3,
-                   dilation_rate=20,
-                   activation=config.optimization.activation, use_bias=False))
-
-        self.avg_layers.append(
-            Conv1D(filters=config.model.filters_dconv, kernel_size=2,
-                   padding='causal',
-                   kernel_initializer=self.kernel_init_avg4,
-                   dilation_rate=40,
-                   activation=config.optimization.activation, use_bias=False))
-
-        self.output_layer = Dense(1, activation=config.optimization.activation,
-                                  kernel_initializer=tf.keras.initializers.constant(np.array([regr_coeff[0],
-                                                                                              regr_coeff[1],
-                                                                                              regr_coeff[6],
-                                                                                              regr_coeff[2],
-                                                                                              regr_coeff[7],
-                                                                                              regr_coeff[3],
-                                                                                              regr_coeff[8],
-                                                                                              regr_coeff[4],
-                                                                                              regr_coeff[9],
-                                                                                              regr_coeff[5],
-                                                                                              regr_coeff[10],
-                                                                                              regr_coeff[11]])),
-                                  use_bias=False)
-
-    def kernel_init_avg1(self, shape=(5, 2, 2), dtype=DTYPE):
-        kernel = np.zeros(shape)
-        kernel[:, :, 0] = np.transpose(np.concatenate([[np.repeat(1 / 5, 5)], [np.zeros(5)]]))
-        kernel[:, :, 1] = np.transpose(np.concatenate([[np.zeros(5)], [np.repeat(1 / 5, 5)]]))
-        return kernel
-
-    def kernel_init_avg2(self, shape=(4, 2, 2), dtype=DTYPE):
-        kernel = np.zeros(shape)
-        kernel[:, :, 0] = np.transpose(np.concatenate([[np.repeat(1 / 4, 4)], [np.zeros(4)]]))
-        kernel[:, :, 1] = np.transpose(np.concatenate([[np.zeros(4)], [np.repeat(1 / 4, 4)]]))
-        return kernel
-
-    def kernel_init_avg3(self, shape=(2, 2, 2), dtype=DTYPE):
-        kernel = np.zeros(shape)
-        kernel[:, :, 0] = np.transpose(np.concatenate([[np.repeat(1 / 2, 2)], [np.zeros(2)]]))
-        kernel[:, :, 1] = np.transpose(np.concatenate([[np.zeros(2)], [np.repeat(1 / 2, 2)]]))
-        return kernel
-
-    def kernel_init_avg4(self, shape=(2, 2, 2), dtype=DTYPE):
-        kernel = np.zeros(shape)
-        kernel[:, :, 0] = np.transpose(np.concatenate([[np.repeat(1 / 2, 2)], [np.zeros(2)]]))
-        kernel[:, :, 1] = np.transpose(np.concatenate([[np.zeros(2)], [np.repeat(1 / 2, 2)]]))
-        return kernel
-
-    @property
-    def max_lag(self):
-        return np.max(self.lags)
-
-    def call(self, inputs, training=False):
-        jumps = tf.expand_dims(inputs[:, :, -1], -1)
-        inputs = inputs[:, :, :-1]
-        avgs = tf.concat([tf.ones([inputs.shape[0], inputs.shape[1], 1]), inputs], axis=-1)
-        for avg_layer in self.avg_layers:
-            avgs = tf.concat([avgs, avg_layer(inputs)], axis=-1)
-            inputs = avgs[:, :, -2:]
-        return tf.clip_by_value(self.output_layer(tf.concat([avgs, jumps], -1))[:, self.max_lag - 1:, :],
-                                clip_value_min=self.clip_value,
-                                clip_value_max=1000)
-
 
 def get_pred(model, scaler, ts, pred_range=None):
     if pred_range is None:

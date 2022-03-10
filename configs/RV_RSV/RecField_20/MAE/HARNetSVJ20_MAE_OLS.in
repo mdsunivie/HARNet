@@ -1,6 +1,7 @@
 {
   "model": "HARNetSVJ",
   "lags": [1, 5, 20],
+  "filters_dconv": 2,
   "baseline_fit": "OLS",
   "scaler": "MinMax",
   "loss": "MAE",

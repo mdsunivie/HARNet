@@ -64,6 +64,9 @@ def main():
     # load data
     ts = get_MAN_data(cfg.path_MAN, cfg.asset, cfg.include_sv)
 
+    if cfg.include_sv and "log" in cfg.scaler.lower():
+        ts.iloc[:, -1] = (1 + ts.values[:, -1] / ts.values[:, 0])
+
     # normalize input time series
     scaler = scaler_from_cfg(cfg)
     ts_norm = pd.DataFrame(data=scaler.fit_transform(ts.to_numpy()), index=ts.index)
@@ -144,3 +147,6 @@ def main():
     print(df_metrics)
     df_metrics.to_csv(save_path_curr + "/metrics.csv")
     print(f"\n-- Experiment finished. Results were saved to {save_path_curr} --\n")
+
+if __name__ == '__main__':
+    main()

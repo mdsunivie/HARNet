@@ -193,10 +193,14 @@ class HAR(object):
     def save(self, path):
         with open(path + "/lm.joblib", "w"):
             joblib.dump(self.lm, path + "/lm.joblib")
+        # save clip value to csv (pandas kann das auch), .np array geht auch
+        #np.savetxt("clipping_value.csv", self.clip_value, delimiter=",")
+
 
     def restore(self, path):
         with open(path + "/lm.joblib", "r"):
             self.lm = joblib.load(path + "/lm.joblib")
+        #load clip value
 
 
 # 3 input channels
@@ -225,7 +229,7 @@ class HARNet(RVPredModel):
     def __init__(self, filters_dconv, use_bias_dconv, activation_dconv, lags, regr_coeff, clip_value):
         super(HARNet, self).__init__()
         self.lags = lags
-        self.clip_value = clip_value
+        self.clip_value = tf.Variable(float(clip_value), name = "clip_value", trainable=False)
         self.har = HAR(lags)
         if np.any(np.array(self.lags)[1:] % np.array(self.lags)[:-1]):
             raise Exception('each lag must be a multiple of the previous one')
@@ -272,7 +276,7 @@ class HARNetSVJ(RVPredModel):
     def __init__(self, filters_dconv, use_bias_dconv, activation_dconv, lags, regr_coeff, clip_value):
         super(HARNetSVJ, self).__init__()
         self.lags = lags
-        self.clip_value = clip_value
+        self.clip_value = tf.Variable(float(clip_value), name = "clip_value", trainable=False)
         if np.any(np.array(self.lags)[1:] % np.array(self.lags)[:-1]):
             raise Exception('each lag must be a multiple of the previous one')
         self.coeffs = regr_coeff

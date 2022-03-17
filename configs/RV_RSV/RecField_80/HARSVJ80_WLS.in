@@ -1,9 +1,10 @@
 {
   "model": "HARSVJ",
   "lags": [1, 5, 20, 40, 80],
-  "baseline_fit": "OLS",
+  "baseline_fit": "WLS",
   "scaler": "None",
   "path_MAN": "./data/MAN_data.csv",
+  "asset": ".SPX",
   "include_sv": true,
   "start_year_train": 2012,
   "n_years_train": 4,

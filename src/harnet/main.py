@@ -11,6 +11,7 @@ import shutil
 from pathlib import Path
 
 import pandas as pd
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from pydantic.json import pydantic_encoder
@@ -44,12 +45,11 @@ def main():
     logger.info(f"Initializing experiment {exp_name}: {cfg.epochs} ...")
     logger.debug(json.dumps(cfg, indent=4, default=pydantic_encoder))
 
-    save_path_curr = os.path.join(cfg.save_path,exp_name)
-    tb_path_curr = os.path.join(cfg.tb_path,exp_name)
+    save_path_curr = os.path.join(cfg.save_path, exp_name)
+    tb_path_curr = os.path.join(cfg.tb_path, exp_name)
 
     if not os.path.exists(Path(cfg.save_path)):
         os.makedirs(Path(cfg.save_path))
-
 
     if not os.path.exists(Path(save_path_curr)):
         os.makedirs(Path(save_path_curr))
@@ -74,7 +74,7 @@ def main():
     # create train datasets
     year_range_train = [cfg.start_year_train, cfg.start_year_train + cfg.n_years_train]
     year_range_test = [cfg.start_year_train + cfg.n_years_train,
-                      cfg.start_year_train + cfg.n_years_train + cfg.n_years_test]
+                       cfg.start_year_train + cfg.n_years_train + cfg.n_years_test]
 
     idx_range_train = year_range_to_idx_range(ts_norm, year_range_train)
     idx_range_test = year_range_to_idx_range(ts_norm, year_range_test)
@@ -147,6 +147,3 @@ def main():
     print(df_metrics)
     df_metrics.to_csv(save_path_curr + "/metrics.csv")
     print(f"\n-- Experiment finished. Results were saved to {save_path_curr} --\n")
-
-if __name__ == '__main__':
-    main()

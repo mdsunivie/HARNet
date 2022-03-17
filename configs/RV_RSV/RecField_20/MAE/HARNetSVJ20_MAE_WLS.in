@@ -6,6 +6,7 @@
   "scaler": "MinMax",
   "loss": "MAE",
   "path_MAN": "./data/MAN_data.csv",
+  "asset": ".SPX",
   "include_sv": true,
   "start_year_train": 2012,
   "n_years_train": 4,

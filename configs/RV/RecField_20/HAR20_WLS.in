@@ -1,9 +1,10 @@
 {
   "model": "HAR",
   "lags": [1, 5, 20],
-  "baseline_fit": "OLS",
+  "baseline_fit": "WLS",
   "scaler": "None",
   "path_MAN": "./data/MAN_data.csv",
+  "asset": ".SPX",
   "start_year_train": 2012,
   "n_years_train": 4,
   "start_year_test": 2016,

@@ -4,7 +4,7 @@
   "filters_dconv": 2,
   "baseline_fit": "OLS",
   "scaler": "LogMinMax",
-  "scaler_min": -13,
+  "scaler_min": -17,
   "scaler_max": -2.5,
   "loss": "MAE",
   "path_MAN": "./data/MAN_data.csv",

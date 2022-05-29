@@ -6,7 +6,8 @@ TensorFlow implementation of the HARNet model for realized volatility forecastin
 
 R. Reisenhofer, X. Bayer, and N. Hautsch <br /> 
 HARNet: A Convolutional Neural Network for Realized Volatility Forecasting <br />
-Arxiv 2022 <br />
+arXiv preprint arXiv:2205.07719, 2022 <br />
+[https://doi.org/10.48550/arXiv.2205.07719](https://doi.org/10.48550/arXiv.2205.07719)
 
 Please cite the paper above when using the HARNet package in your research.
 
@@ -45,4 +46,6 @@ Results and TensorBoards for all experiments are saved in the ./HARNet/results f
 
 # About
 
-The HARNet package was developed by Rafael Reisenhofer and Xandro Bayer. If you have any questions, please contact rafael.reisenhofer@uni-bremen.de.
+The HARNet package was developed by Rafael Reisenhofer and Xandro Bayer.
+
+If you have any questions, please contact [rafael.reisenhofer@uni-bremen.de](mailto:rafael.reisenhofer@uni-bremen.de).

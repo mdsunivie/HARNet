@@ -23,7 +23,7 @@ to install the package.
 
 # Usage
 
-Download the MAN file and save it to HARNet/data.
+Download the realized library from the [Oxford-Man Institute website](https://realized.oxford-man.ox.ac.uk/data/download) and save it to HARNet/data/MAN_data.csv. Make sure to change the filaname to MAN_data.csv to be compatible with the default config files.
 
 Go to the HARNet root directory
 ```bash

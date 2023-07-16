@@ -4,7 +4,7 @@ TensorFlow implementation of the HARNet model for realized volatility forecastin
 
 # Publication
 
-R. Reisenhofer, X. Bayer, and N. Hautsch <br /> 
+R. Reisenhofer, X. Bayer, and N. Hautsch <br />
 HARNet: A Convolutional Neural Network for Realized Volatility Forecasting <br />
 arXiv preprint arXiv:2205.07719, 2022 <br />
 [https://doi.org/10.48550/arXiv.2205.07719](https://doi.org/10.48550/arXiv.2205.07719)
@@ -23,12 +23,12 @@ to install the package.
 
 # Usage
 
-Download the realized library from the [Oxford-Man Institute website](https://realized.oxford-man.ox.ac.uk/data/download) and save it to HARNet/data/MAN_data.csv. Make sure to change the filaname to MAN_data.csv to be compatible with the default config files.
-
 Go to the HARNet root directory
+
 ```bash
 cd HARNet
 ```
+
 an start single experiments based on one of the preset configuration files
 
 ```bash
@@ -47,5 +47,7 @@ Results and TensorBoards for all experiments are saved in the ./HARNet/results f
 # About
 
 The HARNet package was developed by Rafael Reisenhofer and Xandro Bayer.
+
+The data in [data/MAN_data.csv](data/MAN_data.csv) was obtained from the [Oxford-Man Institute website](https://realized.oxford-man.ox.ac.uk).
 
 If you have any questions, please contact [rafael.reisenhofer@uni-bremen.de](mailto:rafael.reisenhofer@uni-bremen.de).

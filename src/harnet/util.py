@@ -34,7 +34,7 @@ class HARNetCfg:
     baseline_fit: str = "WLS"
 
     # Data
-    path_MAN: str = "~/develop/vola/data/MAN_data.csv"
+    path_MAN: str = "./data/MAN_data.csv"
     asset: str = ".SPX"
     include_sv: bool = False
     start_year_train: int = 2012
